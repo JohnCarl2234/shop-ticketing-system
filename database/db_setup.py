@@ -2,7 +2,8 @@ import sqlite3
 from datetime import date
 from pathlib import Path
 
-file = Path('./data/app_data.db')
+folder_path = Path("./data")
+file = Path(f'./{folder_path.mkdir(parents=True, exist_ok=True)}/app_data.db')
 
 def setup_conn():
     try:
