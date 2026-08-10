@@ -9,7 +9,8 @@ def setup_conn():
         connection = sqlite3.connect("./data/app_data.db")
         connection.execute("PRAGMA foreign_keys = ON;")
     except sqlite3.OperationalError as e:
-        return f"Operational Error: {e}"
+        print(f"Operational Error: {e}")
+        connection.close()
     return connection
 
 def cursor(connection):
