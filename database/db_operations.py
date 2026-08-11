@@ -58,3 +58,39 @@ def delete_client(entry):
 def reassign_ticket(old_agent, new_agent):
     query = "UPDATE Tickets SET agent_id = ? WHERE agent_id = ? AND status = 'Open'"
     return cursor.execute(query, (f"{old_agent}",f"{new_agent}")), connect.commit()
+
+# Gets all the clients list
+def get_client(client_id):
+    query = """
+        SELECT 
+        c.cli_id,
+        c.client
+        c.contact_number,
+        c.tkt_ref,
+        c.order_id, 
+        t.tkt_inf,
+        t.status,
+        t.order_date,
+        a.agent_name,
+        FROM Clients c
+        JOIN Tickets t ON c.cli_id = t.client_id
+        LEFT JOIN Agents a ON t.agents_id = a.agent_id
+        WHERE c.cli_id = ?;
+    """ 
+    cursor.execute(query, ("cli_id"))
+    rows = cursor.fetchall()
+    # Results will be stored in a clean list for UI
+    results = []
+    for row in rows:
+        results.append({
+            "client_id" : row[0],
+            "client_name" : row[1],
+            "contact_number": row[2], 
+            "client_ref" : row[3],
+            "ticket_id" : row[4],
+            "issue" : row[5],
+            "status" : row[6], 
+            "date_created" : row[7],
+            "agent_assigned" : row[8]
+        })
+    return results
