@@ -21,32 +21,33 @@ def cursor(connection):
 # Setup database interfaces for client, technicians, administrator
 
 # Client and Technician Table
-clients = """ CREATE TABLE IF NOT EXISTS Clients (
+clients = f""" CREATE TABLE IF NOT EXISTS Clients (
         cli_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
         client TEXT NOT NULL,
         contact_number TEXT NOT NULL,
         email TEXT,
-        address TEXT NOT NULL
+        address TEXT NOT NULL,
+        tkt_ref TEXT GENERATED ALWAYS AS ('CLI-' || printf('%03d-{date.today().year}', cli_id)) STORED UNIQUE
 )
 """
 technicians = f""" CREATE TABLE IF NOT EXISTS Agents (
          agent_id INTEGER PRIMARY KEY AUTOINCREMENT,
-         agent TEXT,
-         assignment TEXT NOT NULL
+         agent_name TEXT,
+         assignment TEXT NOT NULL,
+         is_active INTEGER DEFAULT 1
 )
 """
-# change tkt_id to client_id
+
 # Ticket table (Parents: clients, technicians)
 tickets = f""" CREATE TABLE IF NOT EXISTS Tickets (
         order_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
-        tkt_ref TEXT GENERATED ALWAYS AS ('SVC' || printf('%03d{date.today().year}', order_id)) STORED UNIQUE,
         order_date DATE,
         tkt_inf TEXT NOT NULL,
         resolved_at DATETIME DEFAULT NULL, 
-        status TEXT GENERATED ALWAYS AS (CASE WHEN resolved_at IS NOT NULL AND resolved_at != "None" THEN 'Resolved' ELSE 'Open' END) STORED,
-        tkt_id INTEGER,     
-        agent_id INT DEFAULT 1,
-        FOREIGN KEY (tkt_id) REFERENCES Clients(cli_id) ON DELETE CASCADE,
+        status TEXT GENERATED ALWAYS AS (CASE WHEN resolved_at IS NOT NULL AND resolved_at != 'None' THEN 'Resolved' ELSE 'Open' END) STORED,
+        client_id INTEGER,     
+        agent_id INTEGER DEFAULT 1,
+        FOREIGN KEY (client_id) REFERENCES Clients(cli_id) ON DELETE CASCADE,
         FOREIGN KEY (agent_id) REFERENCES Agents(agent_id) ON DELETE SET DEFAULT
 )
 """
