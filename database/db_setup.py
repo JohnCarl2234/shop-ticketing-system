@@ -22,7 +22,7 @@ def cursor(connection):
 
 # Parent table
 clients = """ CREATE TABLE IF NOT EXISTS clients (
-        cli_no INTEGER PRIMARY KEY AUTOINCREMENT,
+        cli_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
         client TEXT NOT NULL,
         contact TEXT NOT NULL
 )
@@ -30,11 +30,21 @@ clients = """ CREATE TABLE IF NOT EXISTS clients (
 
 # Child table
 tickets = f""" CREATE TABLE IF NOT EXISTS tickets (
-        id INT  EGER UNIQUE PRIMARY KEY AUTOINCREMENT,
-        main_id TEXT GENERATED ALWAYS AS ('SVC' || printf('%03d{date.today().year}', id)) STORED UNIQUE,
+        order_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
+        ticket_number TEXT GENERATED ALWAYS AS ('SVC' || printf('%03d{date.today().year}', order_id)) STORED UNIQUE,
+        order_date DATE,
         ticket_info TEXT NOT NULL,
         ticket_id INTEGER, 
-        FOREIGN KEY (ticket_id) REFERENCES clients (cli_no)
+        FOREIGN KEY (ticket_id) REFERENCES clients(cli_id) ON DELETE CASCADE,
+        agent_id INT DEFAULT 1,
+        FOREIGN KEY (agent_id) REFERENCES agents(tech_id) ON DELETE SET DEFAULT
+)
+"""
+
+technicians = f""" CREATE TABLE IF NOT EXISTS agents (
+        tech_id INTEGER UNIQUE PRIMARY KEY,
+        technician TEXT,
+        assignment VARCHAR(3)
 )
 """
 
@@ -42,6 +52,7 @@ def run_setup():
     try:
         cursor(setup_conn()).execute(clients)
         cursor(setup_conn()).execute(tickets)
+        cursor(setup_conn()).execute(technicians)
         setup_conn().commit()
     except sqlite3.OperationalError as e:
         print(f"Error: {e}")
