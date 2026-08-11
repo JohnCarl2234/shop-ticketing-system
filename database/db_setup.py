@@ -20,18 +20,21 @@ def cursor(connection):
 
 # Setup database interfaces for client, technicians, administrator
 
-tickets = f""" CREATE TABLE IF NOT EXISTS tickets (
-        id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
-        main_id TEXT GENERATED ALWAYS AS ('SVC' || printf('%03d{date.today().year}', id)) STORED UNIQUE,
-        ticket_info TEXT NOT NULL,
-        client_id INTEGER, 
-        FOREIGN KEY (client_id) REFERENCES clients (cli_no)
+# Parent table
+clients = """ CREATE TABLE IF NOT EXISTS clients (
+        cli_no INTEGER PRIMARY KEY AUTOINCREMENT,
+        client TEXT NOT NULL,
+        contact TEXT NOT NULL
 )
 """
 
-clients = """ CREATE TABLE IF NOT EXISTS clients (
-        cli_no INTEGER PRIMARY KEY AUTOINCREMENT,
-        cli_name TEXT NOT NULL
+# Child table
+tickets = f""" CREATE TABLE IF NOT EXISTS tickets (
+        id INT  EGER UNIQUE PRIMARY KEY AUTOINCREMENT,
+        main_id TEXT GENERATED ALWAYS AS ('SVC' || printf('%03d{date.today().year}', id)) STORED UNIQUE,
+        ticket_info TEXT NOT NULL,
+        ticket_id INTEGER, 
+        FOREIGN KEY (ticket_id) REFERENCES clients (cli_no)
 )
 """
 
