@@ -36,7 +36,7 @@ tickets = f""" CREATE TABLE IF NOT EXISTS tickets (
         ticket_info TEXT NOT NULL,
         ticket_id INTEGER, 
         FOREIGN KEY (ticket_id) REFERENCES clients(cli_id) ON DELETE CASCADE,
-        agent_id INT DEFAULT 1,
+        agent_id INTEGER DEFAULT 1,
         FOREIGN KEY (agent_id) REFERENCES agents(tech_id) ON DELETE SET DEFAULT
 )
 """
