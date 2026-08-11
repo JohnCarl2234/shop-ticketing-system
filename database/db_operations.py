@@ -31,10 +31,10 @@ def add_ticket(client_id: str, tkt_info: str, agent_id: str, resolved_at=None):
     VALUES (?, ?, ?, ?, ?)"""
     day = date.today()
     try:
-        if resolved_at == "None":
-            raise Warning("'resolved_at' variable is empty.")
-    except Warning as e:
-        print(f"db_operations: {e}")
+        if resolved_at == None:
+            raise UserWarning("'resolved_at' parameter is empty.")
+    except UserWarning as e:
+        print(f"Warning in db_operations.add_ticket(): {e}")
     return cursor.execute(query, (f"{client_id}", f"{tkt_info}", f"{day}", f"{resolved_at}", f"{agent_id}")), connect.commit()
 
 # Employing new agent 
@@ -54,7 +54,7 @@ def delete_client(entry):
     query = f"DELETE FROM Clients WHERE client = '{entry}'"
     return cursor.execute(query), connect.commit()
 
-# Reassigns open ticket to an existing agent before 
+# Reassigns open ticket to an existing agent before soft deleting
 def reassign_ticket(old_agent, new_agent):
     query = "UPDATE Tickets SET agent_id = ? WHERE agent_id = ? AND status = 'Open'"
     return cursor.execute(query, (f"{old_agent}",f"{new_agent}")), connect.commit()
