@@ -47,7 +47,7 @@ def add_agent(name, assignment):
 # the assigned personnel. # 0 -> Deactivated, 1 -> Active
 def deactivating_agent(agent_id, state):
     query = "UPDATE Agents SET is_active = ? WHERE agent_id = ?"
-    return cursor.execute(query, (f"{state}", f"{agent_id}"))
+    return cursor.execute(query, (f"{state}", f"{agent_id}")), connect.commit()
 
 # Deleting user data
 def delete_client(entry):
