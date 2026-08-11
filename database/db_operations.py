@@ -4,20 +4,6 @@ from datetime import date
 
 # inserting data in the client database
 
-# Updating data of a specific entry/item
-# c.execute("UPDATE employees SET name = '', age = '' WHERE id = '' ")
-# Updating an entire column
-# c.execute("UPDATE employees SET state = ''")
-
-# deleting a specific item by its table and column value
-# c.execute("DELETE FROM employees WHERE first_name = 'Rishelvin'")
-
-# deleting a whole table
-# c.execute("DROP TABLE IF EXISTS employees")
-
-# c.execute("INSERT INTO employees (first_name, last_name, designation) VALUES (?, ?, ?)", (f"{name}", f"{l_name}", f"{assigned}"))
-
-
 app_data = Path("./data/app_data.db")
 # Checks if the directory is created.
 
