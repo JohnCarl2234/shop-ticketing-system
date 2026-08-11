@@ -35,7 +35,7 @@ technicians = f""" CREATE TABLE IF NOT EXISTS Agents (
          assignment TEXT NOT NULL
 )
 """
-
+# change tkt_id to client_id
 # Ticket table (Parents: clients, technicians)
 tickets = f""" CREATE TABLE IF NOT EXISTS Tickets (
         order_id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +43,7 @@ tickets = f""" CREATE TABLE IF NOT EXISTS Tickets (
         order_date DATE,
         tkt_inf TEXT NOT NULL,
         resolved_at DATETIME DEFAULT NULL, 
-        status TEXT GENERATED ALWAYS AS (CASE WHEN resolved_at IS NULL THEN 'Open' ELSE 'Resolved' END) STORED,
+        status TEXT GENERATED ALWAYS AS (CASE WHEN resolved_at IS NOT NULL AND resolved_at != "None" THEN 'Resolved' ELSE 'Open' END) STORED,
         tkt_id INTEGER,     
         agent_id INT DEFAULT 1,
         FOREIGN KEY (tkt_id) REFERENCES Clients(cli_id) ON DELETE CASCADE,
