@@ -23,7 +23,13 @@ cursor = connect.cursor()
 def add_client(name: str, contact_number: str, mail: str, address: str):
     query = """INSERT INTO Clients (client, contact_number, email, address) 
     VALUES (?, ?, ?, ?)"""
-    return cursor.execute(query, (f"{name}", f"{contact_number}", f"{mail}", f"{address}")), connect.commit()
+    try:
+        if not cursor.execute(query, (f"{name}", f"{contact_number}", f"{mail}", f"{address}")):
+            raise sqlite3.OperationalError(f"Error executing function: 'add_client({name}, {contact_number}, {mail}, {address})'")
+        else:
+            connect.commit()
+    except sqlite3.OperationalError as e:
+        return f"sqlite3 client query error: {e}"
 
 # Adding a ticket entry
 def add_ticket(client_id: str, tkt_info: str, agent_id: str, resolved_at=None):
@@ -50,8 +56,8 @@ def deactivating_agent(agent_id, state):
     return cursor.execute(query, (f"{state}", f"{agent_id}")), connect.commit()
 
 # Deleting user data
-def delete_client(entry):
-    query = f"DELETE FROM Clients WHERE client = '{entry}'"
+def delete_client(client_name):
+    query = f"DELETE FROM Clients WHERE client = '{client_name}'"
     return cursor.execute(query), connect.commit()
 
 # Reassigns open ticket to an existing agent before soft deleting
@@ -59,25 +65,25 @@ def reassign_ticket(old_agent, new_agent):
     query = "UPDATE Tickets SET agent_id = ? WHERE agent_id = ? AND status = 'Open'"
     return cursor.execute(query, (f"{old_agent}",f"{new_agent}")), connect.commit()
 
-# Gets all the clients list
+# Get query functions:
 def get_client(client_id):
     query = """
         SELECT 
-        c.cli_id,
-        c.client
-        c.contact_number,
-        c.tkt_ref,
-        c.order_id, 
-        t.tkt_inf,
-        t.status,
-        t.order_date,
-        a.agent_name,
-        FROM Clients c
-        JOIN Tickets t ON c.cli_id = t.client_id
-        LEFT JOIN Agents a ON t.agents_id = a.agent_id
-        WHERE c.cli_id = ?;
+                c.cli_id,
+                c.client,
+                c.contact_number,
+                c.tkt_ref,
+                t.order_id,
+                t.tkt_inf,
+                t.status,
+                t.order_date,
+                a.agent_name
+            FROM Clients c
+            JOIN Tickets t ON c.cli_id = t.client_id
+            LEFT JOIN Agents a ON t.agent_id = a.agent_id
+            WHERE c.cli_id = ?;
     """ 
-    cursor.execute(query, ("cli_id"))
+    cursor.execute(query, (f"{client_id}",))
     rows = cursor.fetchall()
     # Results will be stored in a clean list for UI
     results = []
@@ -93,4 +99,5 @@ def get_client(client_id):
             "date_created" : row[7],
             "agent_assigned" : row[8]
         })
+    connect.commit()
     return results
