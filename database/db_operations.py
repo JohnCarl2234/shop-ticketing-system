@@ -65,7 +65,7 @@ def reassign_ticket(old_agent, new_agent):
         return connection.execute(query, (f"{old_agent}",f"{new_agent}"))
 
 # Fetch function for UI:
-def query_fetch(client_name):
+def query_fetch_transaction(client_name):
     query = """
         SELECT 
                 c.cli_id,
@@ -100,3 +100,22 @@ def query_fetch(client_name):
                 "agent_assigned" : row[8]
             })
         return results    
+
+def check_client(cli_id: int) -> bool:
+    with _get_connection() as connection:
+        query = "SELECT EXISTS(SELECT 1 From Clients WHERE cli_id = ?)"
+        cursor = connection.cursor()
+        cursor.execute(query, (f"{str(cli_id)}",))
+        result = cursor.fetchone()[0]
+        return bool(result) 
+
+def agent_state(agent_id: int) -> bool:
+    with _get_connection() as connection:
+        query = "SELECT is_active FROM Agents WHERE agent_id = ?"
+        cursor = connection.cursor()
+        cursor.execute(query, (f"{str(agent_id)}",))
+        row = cursor.fetchone()
+        if row[0] == 1:
+            return True
+        else: 
+            False
