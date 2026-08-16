@@ -61,7 +61,7 @@ def save_to_db(client: ValidateClient):
 # data_from_ui = {
 #     'client_name' : "Jose P. Rizal",
 #     'contact_number' :  "+639986761126", 
-#     'email' : "arianagrace.mergal@universityofmadrid.edu.sp",
+#     'email' : "jose.rizal@universityofmadrid.edu.sp",
 #     'address': "Barangay 68-B, Sagkahan District, Tacloban City"
 # }
 
